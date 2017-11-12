@@ -23,9 +23,6 @@ public protocol CacheType {
     ///
     /// - Parameter value: An `Identifiable` and `Mergeable` value
     func set<T>(_ value: T) where T: Identifiable, T: Mergeable
-
-    /// Removes all values from the receiver
-    func removeAll()
 }
 
 /// A flat cache that can store, retreive, and observe arbitrary `Identifiable` values
@@ -137,6 +134,7 @@ extension Cache: CacheType {
         }
     }
 
+    /// Removes all values from the receiver
     public func removeAll() {
         queue.async(flags: .barrier) {
             self.valueStorage.removeAll()

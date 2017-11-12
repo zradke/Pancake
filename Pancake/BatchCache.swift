@@ -38,10 +38,6 @@ extension BatchCache: CacheType {
 
         touchedKeys.insert(key)
     }
-
-    func removeAll() {
-        cache?.removeAll()
-    }
 }
 
 extension Cache {
