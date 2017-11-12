@@ -66,8 +66,8 @@ public class Cache {
         }
     }
 
-    func touchedValuesForObservers(for key: CacheKey) -> [Observer: Any] {
-        var touchedKeys: Set<CacheKey> = [key]
+    func touchedValuesForObservers(for keys: Set<CacheKey>) -> [Observer: Any] {
+        var touchedKeys: Set<CacheKey> = keys
 
         func accumulateTouchedKeys(for currentKey: CacheKey, touchedKeys: inout Set<CacheKey>) {
             let directlyRelatedKeys = relationshipStorage
@@ -81,7 +81,9 @@ public class Cache {
             }
         }
 
-        accumulateTouchedKeys(for: key, touchedKeys: &touchedKeys)
+        for key in keys {
+            accumulateTouchedKeys(for: key, touchedKeys: &touchedKeys)
+        }
 
         let pairs: [(Observer, Any)] = observerStorage
             .allObjects
@@ -114,7 +116,7 @@ extension Cache: CacheType {
         queue.async(flags: .barrier) {
             let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
             self.set(value, for: key)
-            let touchedValuesForObservers = self.touchedValuesForObservers(for: key)
+            let touchedValuesForObservers = self.touchedValuesForObservers(for: [key])
 
             for (observer, value) in touchedValuesForObservers {
                 observer.observation(value)
@@ -126,7 +128,7 @@ extension Cache: CacheType {
         queue.async(flags: .barrier) {
             let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
             self.merge(value, for: key)
-            let touchedValuesForObservers = self.touchedValuesForObservers(for: key)
+            let touchedValuesForObservers = self.touchedValuesForObservers(for: [key])
 
             for (observer, value) in touchedValuesForObservers {
                 observer.observation(value)

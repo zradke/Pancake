@@ -3,11 +3,11 @@ import Foundation
 
 class BatchCache {
     var cache: Cache?
-    var touchedValuesForObservers: [Observer: Any]
+    var touchedKeys: Set<CacheKey>
 
     init(cache: Cache) {
         self.cache = cache
-        self.touchedValuesForObservers = [:]
+        self.touchedKeys = []
     }
 
     func unregister() {
@@ -27,7 +27,7 @@ extension BatchCache: CacheType {
         let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
         cache.set(value, for: key)
 
-        touchedValuesForObservers.merge(cache.touchedValuesForObservers(for: key), uniquingKeysWith: { return $1 })
+        touchedKeys.insert(key)
     }
 
     func set<T>(_ value: T) where T : Identifiable, T : Mergeable {
@@ -36,7 +36,7 @@ extension BatchCache: CacheType {
         let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
         cache.merge(value, for: key)
 
-        touchedValuesForObservers.merge(cache.touchedValuesForObservers(for: key), uniquingKeysWith: { return $1 })
+        touchedKeys.insert(key)
     }
 
     func removeAll() {
@@ -61,7 +61,7 @@ extension Cache {
             action(batchCache)
             batchCache.unregister()
 
-            for (observer, value) in batchCache.touchedValuesForObservers {
+            for (observer, value) in self.touchedValuesForObservers(for: batchCache.touchedKeys) {
                 observer.observation(value)
             }
         }
