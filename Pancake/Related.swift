@@ -4,7 +4,7 @@ import Foundation
 /// Representation of a relationship to a cacheable value
 ///
 /// - SeeAlso: `Identifiable`
-public struct Related<T> where T: Identifiable {
+public struct Related<T>: Codable where T: Identifiable {
     /// The identifier of the related value
     public let relatedIdentifier: T.Identifier
 

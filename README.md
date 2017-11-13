@@ -55,7 +55,7 @@ struct Book: Identifiable {
 }
 ```
 
-Any type can be used as the `Identifier` as long as it conforms to `CustomStringConvertible`. The `Cache` works best with value types rather than reference types, so prefer `struct` to `class`.
+Any type can be used as the `Identifier` as long as it conforms to `CustomStringConvertible`, `Hashable`, and `Codable`. The `Cache` works best with value types rather than reference types, so prefer `struct` to `class` for both the model and `Identifier`.
 
 ### Add values to a `Cache`
 

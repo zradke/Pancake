@@ -35,7 +35,7 @@ struct MergeableModel: Identifiable, Mergeable, Equatable {
     }
 }
 
-struct RelatedModel: Identifiable, HasCachedRelationships, Equatable {
+struct RelatedModel: Identifiable, HasCachedRelationships, Equatable, Codable {
     var identifier: String
     var label: String?
     var parent: Related<RelatedModel>?

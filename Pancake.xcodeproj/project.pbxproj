@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		121E5BD51FB97DBF005ACBDE /* RelatedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 121E5BD41FB97DBF005ACBDE /* RelatedTests.swift */; };
 		12D83C1A1FB7B45F008DC47E /* CacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D83C191FB7B45F008DC47E /* CacheTests.swift */; };
 		12D83C1C1FB7B485008DC47E /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D83C1B1FB7B485008DC47E /* TestModel.swift */; };
 		12D83C1E1FB7BCB3008DC47E /* ObserverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D83C1D1FB7BCB3008DC47E /* ObserverTests.swift */; };
@@ -36,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		121E5BD41FB97DBF005ACBDE /* RelatedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelatedTests.swift; sourceTree = "<group>"; };
 		12D83C191FB7B45F008DC47E /* CacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheTests.swift; sourceTree = "<group>"; };
 		12D83C1B1FB7B485008DC47E /* TestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
 		12D83C1D1FB7BCB3008DC47E /* ObserverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserverTests.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				12D83C1F1FB7C75A008DC47E /* CachedTests.swift */,
 				12D83C1D1FB7BCB3008DC47E /* ObserverTests.swift */,
 				12E29A3A1FB7CCC50028C544 /* BatchCacheTests.swift */,
+				121E5BD41FB97DBF005ACBDE /* RelatedTests.swift */,
 				12D83C1B1FB7B485008DC47E /* TestModel.swift */,
 				12F1CD611F99A7E900EC7D1A /* Info.plist */,
 			);
@@ -255,6 +258,7 @@
 				12E29A3B1FB7CCC50028C544 /* BatchCacheTests.swift in Sources */,
 				12D83C1A1FB7B45F008DC47E /* CacheTests.swift in Sources */,
 				12D83C1C1FB7B485008DC47E /* TestModel.swift in Sources */,
+				121E5BD51FB97DBF005ACBDE /* RelatedTests.swift in Sources */,
 				12D83C1E1FB7BCB3008DC47E /* ObserverTests.swift in Sources */,
 				12D83C201FB7C75A008DC47E /* CachedTests.swift in Sources */,
 			);

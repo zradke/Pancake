@@ -9,8 +9,9 @@ import Foundation
 public protocol Identifiable {
     /// The type of value identifiers
     ///
-    /// This type should be representable as a `String` in order to convert properly into a `CacheKey`
-    associatedtype Identifier: CustomStringConvertible, Hashable
+    /// This type should be representable as a `String` in order to convert properly into a `CacheKey`, but also should be `Codable` and
+    /// `Hashable` to allow for `Codable` `Related` values.
+    associatedtype Identifier: CustomStringConvertible, Codable, Hashable
 
     /// The identifier of the value
     var identifier: Identifier { get }

@@ -2,7 +2,7 @@
 import Foundation
 
 /// A type agnostic key used by the `Cache` to identify values
-public struct CacheKey {
+public struct CacheKey: Codable {
     public let typeName: String
     public let identifier: String
 }
