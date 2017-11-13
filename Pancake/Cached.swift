@@ -18,9 +18,12 @@ public class Cached<T> where T: Identifiable {
         }
     }
 
-    weak var cache: Cache?
+    /// The cache backing the value
+    ///
+    /// While nillable, this should typically never be nil as long as the `Cache` persists.
+    public internal(set) weak var cache: Cache?
 
-    init(identifier: T.Identifier, cache: Cache) {
+    public init(identifier: T.Identifier, cache: Cache) {
         self.identifier = identifier
         self.cache = cache
     }
