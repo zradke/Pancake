@@ -52,13 +52,16 @@ extension Cache {
     ///
     /// - Parameter action: A closure given an abstract `CacheType` on which to perform batched updates
     public func performBatchUpdates(_ action: @escaping (CacheType) -> Void) {
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             let batchCache = BatchCache(cache: self)
             action(batchCache)
             batchCache.unregister()
 
-            for (observer, value) in self.touchedValuesForObservers(for: batchCache.touchedKeys) {
-                observer.observation(value)
+            let touchedValuesForObservers = self.touchedValuesForObservers(for: batchCache.touchedKeys)
+            self.observerQueue.async {
+                for (observer, value) in touchedValuesForObservers {
+                    observer.observation(value)
+                }
             }
         }
     }

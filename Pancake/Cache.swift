@@ -35,13 +35,20 @@ public protocol CacheType {
 ///
 /// - SeeAlso: `Identifiable`
 public class Cache {
-    let queue: DispatchQueue
+    let workQueue: DispatchQueue
+    let observerQueue: DispatchQueue
+
     var valueStorage: [CacheKey: Any]
     var relationshipStorage: [CacheKey: Set<CacheKey>]
     let observerStorage: NSHashTable<Observer>
 
     public init() {
-        self.queue = DispatchQueue(label: "com.zachradke.pancake.cache.queue", attributes: .concurrent)
+        // Concurrent queue for ensuring thread safety with storage
+        self.workQueue = DispatchQueue(label: "com.zachradke.pancake.cache.workqueue", attributes: .concurrent)
+
+        // Serial queue for dispatching observations to prevent deadlock
+        self.observerQueue = DispatchQueue(label: "com.zachradke.pancake.cache.observerqueue")
+
         self.valueStorage = [:]
         self.relationshipStorage = [:]
         self.observerStorage = .weakObjects()
@@ -102,7 +109,7 @@ extension Cache: CacheType {
         let key = CacheKey(typeName: T.typeName, identifier: identifier.description)
         var value: T?
 
-        queue.sync {
+        workQueue.sync {
             value = self.valueStorage[key] as? T
         }
 
@@ -110,33 +117,36 @@ extension Cache: CacheType {
     }
 
     public func set<T>(_ value: T) where T : Identifiable {
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
             self.set(value, for: key)
             let touchedValuesForObservers = self.touchedValuesForObservers(for: [key])
 
-            for (observer, value) in touchedValuesForObservers {
-                observer.observation(value)
+            self.observerQueue.async {
+                for (observer, value) in touchedValuesForObservers {
+                    observer.observation(value)
+                }
             }
         }
     }
 
     public func set<T>(_ value: T) where T : Identifiable, T : Mergeable {
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             let key = CacheKey(typeName: T.typeName, identifier: value.identifier.description)
             self.merge(value, for: key)
             let touchedValuesForObservers = self.touchedValuesForObservers(for: [key])
 
-            for (observer, value) in touchedValuesForObservers {
-                observer.observation(value)
+            self.observerQueue.async {
+                for (observer, value) in touchedValuesForObservers {
+                    observer.observation(value)
+                }
             }
-
         }
     }
 
     /// Removes all values from the receiver
     public func removeAll() {
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             self.valueStorage.removeAll()
             self.relationshipStorage.removeAll()
         }

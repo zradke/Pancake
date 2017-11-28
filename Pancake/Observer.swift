@@ -64,7 +64,7 @@ extension Cache {
             if let value = value as? T { observation(value) }
         }
 
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             self.observerStorage.add(observer)
         }
 
@@ -112,7 +112,7 @@ extension Cache {
 
     /// Removes any values from the receiver that are not directly or indirectly observed
     public func pruneUnobservedValues() {
-        queue.async(flags: .barrier) {
+        workQueue.async(flags: .barrier) {
             let directlyObservedKeys = Set(self.observerStorage.allObjects.map { $0.key })
             var observedKeys = directlyObservedKeys
 

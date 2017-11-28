@@ -80,4 +80,37 @@ class BatchCacheTests: XCTestCase {
         XCTAssertEqual(observedModel, child)
         XCTAssertEqual(observationCount, 1)
     }
+
+    func testRetreiveCachedValueWithinObservationDuringBatchUpdate() {
+        // GIVEN: A model inserted in the cache and uses a cached value inside the observation
+        let model = SimpleModel(identifier: "A", counter: 1)
+        cache.set(model)
+        let cached = cache.cached(model)
+
+        var observationCount = 0
+        var observedModel: SimpleModel?
+        let disposable = cached.observe { [weak cached] (_) in
+            observationCount += 1
+            observedModel = cached?.value
+        }
+        _ = disposable
+
+        // WHEN: Batch updates are performed on the model
+        cache.performBatchUpdates { (cache) in
+            var updated = model
+            updated.counter += 1
+
+            cache.set(updated)
+
+            updated.counter += 1
+
+            cache.set(updated)
+        }
+
+        // EXPECT: The value to be changed in the cache and the observer to be notified once
+        let expected = SimpleModel(identifier: "A", counter: 3)
+        XCTAssertEqual(cache.get(model.identifier), expected)
+        XCTAssertEqual(observedModel, expected)
+        XCTAssertEqual(observationCount, 1)
+    }
 }

@@ -98,6 +98,33 @@ class ObserverTests: XCTestCase {
         XCTAssertEqual(observedModel, child)
     }
 
+    func testRetrieveCachedValueInObservation() {
+        // GIVEN: A cached model inserted in the cache
+        let model = SimpleModel(identifier: "A", counter: 1)
+        cache.set(model)
+        let cached = cache.cached(model)
+
+        // WHEN: The model is observed and the cached value is retreived
+        var observedModel: SimpleModel?
+        let expectation = self.expectation(description: "Observer notified")
+        let disposable = cached.observe { [weak cached] (_) in
+            observedModel = cached?.value
+            expectation.fulfill()
+        }
+
+        // EXPECT: A disposable to be generated and the observation to not be called
+        XCTAssertNotNil(disposable)
+        XCTAssertNil(observedModel)
+
+        // WHEN: The model is updated in the cache
+        let updated = SimpleModel(identifier: "A", counter: 2)
+        cache.set(updated)
+
+        // EXPECT: The observer to be notified passing the updated model
+        waitForExpectations(timeout: 2, handler: nil)
+        XCTAssertEqual(observedModel, updated)
+    }
+
     func testObservationLifespan() {
         // GIVEN: A model inserted into the cache
         let model = SimpleModel(identifier: "A", counter: 1)
