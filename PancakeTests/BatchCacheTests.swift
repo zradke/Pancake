@@ -31,7 +31,7 @@ class BatchCacheTests: XCTestCase {
 
         // WHEN: Batch updates are performed on the model
         let batchUpdateExpectation = self.expectation(description: "Batch update executed")
-        cache.performBatchUpdates { (cache) in
+        cache.performBatchUpdates({ (cache) in
             var updated = model
             updated.counter += 1
 
@@ -40,9 +40,7 @@ class BatchCacheTests: XCTestCase {
             updated.counter += 1
 
             cache.set(updated)
-
-            batchUpdateExpectation.fulfill()
-        }
+        }, completion: { batchUpdateExpectation.fulfill() })
 
         // EXPECT: The value to be changed in the cache
         wait(for: [batchUpdateExpectation], timeout: 2)
@@ -77,7 +75,7 @@ class BatchCacheTests: XCTestCase {
 
         // WHEN: Batch updates are performed on a related model
         let batchUpdateExpectation = self.expectation(description: "Batch update executed")
-        cache.performBatchUpdates { (cache) in
+        cache.performBatchUpdates({ (cache) in
             cache.set(grandparent)
 
             var updated = parent
@@ -88,9 +86,7 @@ class BatchCacheTests: XCTestCase {
             updated.label = "New"
 
             cache.set(updated)
-
-            batchUpdateExpectation.fulfill()
-        }
+        }, completion: { batchUpdateExpectation.fulfill() })
 
         // EXPECT: The value to be changed in the cache
         wait(for: [batchUpdateExpectation], timeout: 2)
@@ -122,7 +118,7 @@ class BatchCacheTests: XCTestCase {
 
         // WHEN: Batch updates are performed on the model
         let batchUpdateExpectation = self.expectation(description: "Batch update executed")
-        cache.performBatchUpdates { (cache) in
+        cache.performBatchUpdates({ (cache) in
             var updated = model
             updated.counter += 1
 
@@ -131,9 +127,7 @@ class BatchCacheTests: XCTestCase {
             updated.counter += 1
 
             cache.set(updated)
-
-            batchUpdateExpectation.fulfill()
-        }
+        }, completion: { batchUpdateExpectation.fulfill() })
 
         // EXPECT: The value to be changed in the cache
         wait(for: [batchUpdateExpectation], timeout: 2)
@@ -165,7 +159,7 @@ class BatchCacheTests: XCTestCase {
 
         // WHEN: Batch updates are performed on the model and the value is retreived from the cache
         let batchUpdateExpectation = self.expectation(description: "Batch update executed")
-        cache.performBatchUpdates { (cache) in
+        cache.performBatchUpdates({ (cache) in
             var updated = cached.value!
             updated.counter += 1
 
@@ -174,9 +168,7 @@ class BatchCacheTests: XCTestCase {
             updated.counter += 1
 
             cache.set(updated)
-
-            batchUpdateExpectation.fulfill()
-        }
+        }, completion: { batchUpdateExpectation.fulfill() })
 
         // EXPECT: The value to be changed in the cache
         wait(for: [batchUpdateExpectation], timeout: 2)
@@ -187,5 +179,28 @@ class BatchCacheTests: XCTestCase {
         waitForExpectations(timeout: 2, handler: nil)
         XCTAssertEqual(observedModel, expected)
         XCTAssertEqual(observationCount, 1)
+    }
+
+    func testStaleValuesDuringBatchUpdateAndUpdatedValuesAfterBatchUpdate() {
+        // GIVEN: A cached model that is not inserted in the cache
+        let model = SimpleModel(identifier: "A", counter: 1)
+        let cached: Cached<SimpleModel> = cache.cached(model)
+
+        // WHEN: Batch updates are performed and the model is saved, but the cached value is accessed
+        var modelDuringBatchUpdate: SimpleModel?
+        var modelInCompletion: SimpleModel?
+        let batchUpdateExpectation = self.expectation(description: "Batch update executed")
+        cache.performBatchUpdates({ (cache) in
+            cache.set(model)
+            modelDuringBatchUpdate = cached.value
+        }, completion: {
+            modelInCompletion = cached.value
+            batchUpdateExpectation.fulfill()
+        })
+
+        // EXPECT: The cached model to be stale during the batch update, and fresh in the completion
+        waitForExpectations(timeout: 2, handler: nil)
+        XCTAssertNil(modelDuringBatchUpdate)
+        XCTAssertEqual(modelInCompletion, model)
     }
 }

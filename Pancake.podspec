@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'Pancake'
-  s.version = '0.4.0'
+  s.version = '0.5.0'
   s.license = 'MIT'
   s.summary = 'Flat cache built in Swift'
   s.homepage = 'https://github.com/zradke/Pancake'
